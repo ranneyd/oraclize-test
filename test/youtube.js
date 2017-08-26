@@ -1,11 +1,22 @@
 var Youtube = artifacts.require("./Youtube.sol");
 
 contract('youtube', function(accounts) {
-    it("should put 10000 MetaCoin in the first account", function() {
-        return Youtube.deployed().then(function(instance) {
-            return instance.getViews.call();
-        }).then(function(views) {
-            assert.equal(views, 20000000, "Views stuff");
-        });
+
+  it('Receive Youtube Views', () => {
+    return Youtube.deployed().then((_instance) => {
+      var events = _instance.ViewsReceived()
+
+      events.watch((error, result) => {
+        if (error == null) {
+          console.log("views: ", result.args.views);
+          events.stopWatching()
+        }
+      });
+
+      _instance.update(0, {
+        from: accounts[0],
+        gas: 2000000
+      });
     });
+  });
 });
